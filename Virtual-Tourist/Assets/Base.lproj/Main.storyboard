@@ -43,7 +43,7 @@
         <!--Photo Album View Controller-->
         <scene sceneID="GBH-PY-bbQ">
             <objects>
-                <viewController id="j5R-7u-UsU" customClass="PhotoAlbumViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="PhotoAlbumViewController" id="j5R-7u-UsU" customClass="PhotoAlbumViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="5tF-a5-8eZ">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -52,8 +52,9 @@
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0HG-k5-HZO" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <navigationItem title="Virtual Tourist" id="uAD-6P-DDr"/>
             </objects>
-            <point key="canvasLocation" x="2618" y="30"/>
+            <point key="canvasLocation" x="2806" y="31"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Kab-Yw-P2y">

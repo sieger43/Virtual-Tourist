@@ -44,7 +44,17 @@ extension TravelLocationMapViewController: MKMapViewDelegate {
         return view
     }
     
-    
+    func mapView(_ mapView: MKMapView,
+                 didSelect view: MKAnnotationView) {
+        let photoViewController = self.storyboard!.instantiateViewController(withIdentifier: "PhotoAlbumViewController") as! PhotoAlbumViewController
+        
+        let backItem = UIBarButtonItem()
+        backItem.title = "OK"
+        navigationItem.backBarButtonItem = backItem
+
+        self.navigationController!.pushViewController(photoViewController, animated: true)
+    }
+
     @objc func checkAction(_ gestureRecognizer: UILongPressGestureRecognizer) {
 
         if gestureRecognizer.state == .began {
