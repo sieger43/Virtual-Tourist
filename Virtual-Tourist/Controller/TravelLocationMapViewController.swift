@@ -18,7 +18,7 @@ class TravelLocationMapViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         mapView.delegate = self
-        let tap = UITapGestureRecognizer(target: self, action: #selector(self.checkAction))
+        let tap = UILongPressGestureRecognizer(target: self, action: #selector(self.checkAction))
         mapView.addGestureRecognizer(tap)
     }
 
@@ -29,19 +29,38 @@ class TravelLocationMapViewController: UIViewController {
 
 extension TravelLocationMapViewController: MKMapViewDelegate {
 
-    @objc func checkAction(sender : UITapGestureRecognizer) {
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
 
-        print("click")
+        let identifier = "marker"
+        var view: MKPinAnnotationView
 
-//        if self.mapView.selectedAnnotations.count > 0 {
-//
-//
-//            let annotation = self.mapView.selectedAnnotations[0]
-//
-//            if let rawstring = annotation.subtitle, let urlstring = rawstring,
-//                let url = URL(string: urlstring) {
-//                UIApplication.shared.open(url, options: [:])
-//            }
-//        }
+        if let dequeuedView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
+            as? MKPinAnnotationView {
+            dequeuedView.annotation = annotation
+            view = dequeuedView
+        } else {
+            view = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+        }
+        return view
+    }
+    
+    
+    @objc func checkAction(_ gestureRecognizer: UILongPressGestureRecognizer) {
+
+        if gestureRecognizer.state == .began {
+            print("click")
+            
+            let touchLocation = gestureRecognizer.location(in: mapView)
+            let locationCoordinate = mapView.convert(touchLocation, toCoordinateFrom: mapView)
+            let click_latitude = locationCoordinate.latitude
+            let click_longitude = locationCoordinate.longitude
+            print("Tapped at lat: \(click_latitude) long: \(click_longitude)")
+
+            DispatchQueue.main.async(execute: {
+                let annotation = MKPointAnnotation()
+                annotation.coordinate = CLLocationCoordinate2D(latitude: click_latitude, longitude: click_longitude)
+                self.mapView.addAnnotation(annotation)
+            })
+        }
     }
 }
