@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		99A07EFB229B567C00892EAF /* PhotoAlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A07EFA229B567C00892EAF /* PhotoAlbumViewController.swift */; };
 		99E593B822962A35008B91D7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99E593B722962A35008B91D7 /* AppDelegate.swift */; };
 		99E593BA22962A35008B91D7 /* TravelLocationMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99E593B922962A35008B91D7 /* TravelLocationMapViewController.swift */; };
 		99E593BD22962A35008B91D7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 99E593BB22962A35008B91D7 /* Main.storyboard */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		99A07EFA229B567C00892EAF /* PhotoAlbumViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAlbumViewController.swift; sourceTree = "<group>"; };
 		99E593B422962A35008B91D7 /* Virtual-Tourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Virtual-Tourist.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		99E593B722962A35008B91D7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		99E593B922962A35008B91D7 /* TravelLocationMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelLocationMapViewController.swift; sourceTree = "<group>"; };
@@ -56,6 +58,7 @@
 			isa = PBXGroup;
 			children = (
 				99E593B922962A35008B91D7 /* TravelLocationMapViewController.swift */,
+				99A07EFA229B567C00892EAF /* PhotoAlbumViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -173,6 +176,7 @@
 				99E593BA22962A35008B91D7 /* TravelLocationMapViewController.swift in Sources */,
 				99E593C022962A35008B91D7 /* Virtual_Tourist.xcdatamodeld in Sources */,
 				99E593B822962A35008B91D7 /* AppDelegate.swift in Sources */,
+				99A07EFB229B567C00892EAF /* PhotoAlbumViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
