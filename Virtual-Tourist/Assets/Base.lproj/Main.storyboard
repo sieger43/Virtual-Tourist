@@ -94,6 +94,9 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="HrW-Fb-KF4"/>
                     </view>
+                    <connections>
+                        <outlet property="collectionView" destination="DM6-l3-xSG" id="LNa-sG-Bef"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0HG-k5-HZO" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationItem title="Virtual Tourist" id="uAD-6P-DDr"/>
