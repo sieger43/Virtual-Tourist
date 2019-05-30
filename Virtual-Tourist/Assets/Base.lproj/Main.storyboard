@@ -96,6 +96,7 @@
                     </view>
                     <connections>
                         <outlet property="collectionView" destination="DM6-l3-xSG" id="LNa-sG-Bef"/>
+                        <outlet property="mapView" destination="GJd-wh-QP9" id="aDF-qF-yQ3"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0HG-k5-HZO" userLabel="First Responder" sceneMemberID="firstResponder"/>

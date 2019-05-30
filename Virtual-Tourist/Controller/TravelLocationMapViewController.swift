@@ -51,8 +51,14 @@ extension TravelLocationMapViewController: MKMapViewDelegate {
         let backItem = UIBarButtonItem()
         backItem.title = "OK"
         navigationItem.backBarButtonItem = backItem
-
-        self.navigationController!.pushViewController(photoViewController, animated: true)
+        
+        if let annotation = view.annotation {
+            
+            photoViewController.lat = annotation.coordinate.latitude;
+            photoViewController.lon = annotation.coordinate.longitude;
+            
+            self.navigationController!.pushViewController(photoViewController, animated: true)
+        }
     }
 
     @objc func checkAction(_ gestureRecognizer: UILongPressGestureRecognizer) {

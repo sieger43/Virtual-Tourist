@@ -29,21 +29,6 @@ class FlickrClient
         
     }
     
-    class func handleFlickrSearchResponse(success: Bool, error: Error?, response: FlickrSearchResponse?) {
-        if success {
-            print("Happy FlickrSearchResponse")
-            
-            if let thedata = response {
-                print("\(thedata)")
-            }
-            
-        } else {
-            let message = error?.localizedDescription ?? ""
-            print("\(message)");
-            print("Sad FlickrSearchResponse")
-        }
-    }
-    
     class func getPhotoList(completion: @escaping (Bool, Error?, FlickrSearchResponse?) -> Void) {
         
         let qItems = [URLQueryItem(name: "method", value: "flickr.photos.search"),
@@ -52,7 +37,8 @@ class FlickrClient
                       URLQueryItem(name: "nojsoncallback", value: "1"),
                       URLQueryItem(name: "lat", value: "43.204940"),
                       URLQueryItem(name: "lon", value: "-77.691951"),
-                      URLQueryItem(name: "extras", value: "url_m")]
+                      URLQueryItem(name: "per_page", value: "21"),
+                      URLQueryItem(name: "extras", value: "url_t")]
         
         //+ "?method=flickr.photos.search&format=json&nojsoncallback=1&api_key=" + restApiKey
         // FlickrClient.getPhotoList(completion: FlickrClient.handleFlickrSearchResponse)
