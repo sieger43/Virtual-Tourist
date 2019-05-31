@@ -9,7 +9,7 @@
 import Foundation
 
 struct FlickrSearchResponse: Codable {
-    let photos: FlickPhotoInformation?
-    let stat: String?
+    let photos: FlickPhotoInformation
+    let stat: String
 }
 

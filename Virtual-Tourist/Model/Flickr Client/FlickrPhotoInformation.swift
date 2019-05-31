@@ -9,10 +9,10 @@
 import Foundation
 
 struct FlickPhotoInformation : Codable {
-    let page : Int?
-    let pages : Int?
-    let perpage : Int?
-    let total : String?
+    let page : Int
+    let pages : Int
+    let perpage : Int
+    let total : String
     let photo : [FlickrPhotoRecord]
 }
 

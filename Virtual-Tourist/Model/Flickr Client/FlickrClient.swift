@@ -85,6 +85,9 @@ class FlickrClient
             do {
                 let responseObject = try decoder.decode(ResponseType.self, from: data)
                 DispatchQueue.main.async {
+                    
+                    
+                    
                     completion(responseObject, nil)
                 }
             } catch {

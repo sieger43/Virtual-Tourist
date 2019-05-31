@@ -19,9 +19,9 @@ struct FlickrPhotoRecord : Codable {
     let ispublic : Int?
     let isfriend : Int?
     let isfamily : Int?
-    let url_m : String?
-    let height_m : String?
-    let width_m : String?
+    let url_t : String
+    let height_t : String?
+    let width_t : String?
     
     enum CodingKeys: String, CodingKey {
         
@@ -34,8 +34,8 @@ struct FlickrPhotoRecord : Codable {
         case ispublic
         case isfriend
         case isfamily
-        case url_m
-        case height_m
-        case width_m
+        case url_t
+        case height_t
+        case width_t
     }
 }

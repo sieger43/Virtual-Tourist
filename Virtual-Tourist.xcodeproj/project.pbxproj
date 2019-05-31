@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		99378A9D22A0BBBA0046F7AA /* PhotoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99378A9C22A0BBBA0046F7AA /* PhotoCell.swift */; };
 		99A07EFB229B567C00892EAF /* PhotoAlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A07EFA229B567C00892EAF /* PhotoAlbumViewController.swift */; };
 		99E593B822962A35008B91D7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99E593B722962A35008B91D7 /* AppDelegate.swift */; };
 		99E593BA22962A35008B91D7 /* TravelLocationMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99E593B922962A35008B91D7 /* TravelLocationMapViewController.swift */; };
@@ -22,6 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		99378A9C22A0BBBA0046F7AA /* PhotoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCell.swift; sourceTree = "<group>"; };
 		99A07EFA229B567C00892EAF /* PhotoAlbumViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAlbumViewController.swift; sourceTree = "<group>"; };
 		99E593B422962A35008B91D7 /* Virtual-Tourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Virtual-Tourist.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		99E593B722962A35008B91D7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -71,6 +73,7 @@
 			children = (
 				99E593B922962A35008B91D7 /* TravelLocationMapViewController.swift */,
 				99A07EFA229B567C00892EAF /* PhotoAlbumViewController.swift */,
+				99378A9C22A0BBBA0046F7AA /* PhotoCell.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -218,6 +221,7 @@
 				99E593C022962A35008B91D7 /* Virtual_Tourist.xcdatamodeld in Sources */,
 				99FC059C229CAF7600B502C7 /* FlickrClient.swift in Sources */,
 				99FC059A229CAF4A00B502C7 /* FlickrPhotoInformation.swift in Sources */,
+				99378A9D22A0BBBA0046F7AA /* PhotoCell.swift in Sources */,
 				99FC0598229CAF0300B502C7 /* FlickrPhotoRecord.swift in Sources */,
 				99E593B822962A35008B91D7 /* AppDelegate.swift in Sources */,
 				99A07EFB229B567C00892EAF /* PhotoAlbumViewController.swift in Sources */,

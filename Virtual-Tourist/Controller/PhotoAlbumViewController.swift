@@ -10,6 +10,12 @@ import Foundation
 import MapKit
 import UIKit
 
+class VirtualTouristModel {
+    
+    static var images = [UIImage]()
+    
+}
+
 class PhotoAlbumViewController: UIViewController {
     
     private let reuseIdentifier = "FlickrCell"
@@ -30,6 +36,45 @@ class PhotoAlbumViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         collectionView.dataSource = self
+        
+        FlickrClient.getPhotoList(){ success, error, response in
+            if success {
+                print("Happy FlickrSearchResponse")
+                
+                if let thedata = response?.photos.photo {
+                    
+                    DispatchQueue.main.async(execute: {
+                    
+                        for photoRecord in thedata {
+                            print("\(photoRecord.url_t)")
+                            
+                            let url = URL(string: photoRecord.url_t)
+                            
+                            if let unwrapped_URL = url {
+                                
+
+                                    do {
+                                        let imageData = try Data(contentsOf: unwrapped_URL)
+                                        if let image = UIImage(data: imageData) {
+                                            VirtualTouristModel.images.append(image)
+                                        }
+                                    } catch {
+                                        // empty
+                                    }
+                            }
+                        }
+                        
+                        self.collectionView?.reloadData()
+                    })
+
+                }
+                
+            } else {
+                let message = error?.localizedDescription ?? ""
+                print("\(message)");
+                print("Sad FlickrSearchResponse")
+            }
+        }
     }
     
     func centerMapOnLocation() {
@@ -45,35 +90,26 @@ class PhotoAlbumViewController: UIViewController {
             self.mapView.addAnnotation(annotation)
         }
     }
-    
-    class func handleFlickrSearchResponse(success: Bool, error: Error?, response: FlickrSearchResponse?) {
-        if success {
-            print("Happy FlickrSearchResponse")
-            
-            if let thedata = response {
-                print("\(thedata)")
-            }
-            
-        } else {
-            let message = error?.localizedDescription ?? ""
-            print("\(message)");
-            print("Sad FlickrSearchResponse")
-        }
-    }
 }
 
 extension PhotoAlbumViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        print("foo")
+        print("\(VirtualTouristModel.images.count)")
         
-        return 0
+        return VirtualTouristModel.images.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier,
-                                                      for: indexPath)
+                                                      for: indexPath) as! PhotoCell
         print("bar")
+        
+        //2
+        let photo = VirtualTouristModel.images[1]
+        cell.backgroundColor = .white
+        //3
+        cell.imageView.image = photo
         
         return cell
     }
