@@ -10,7 +10,7 @@ import Foundation
 
 class FlickrClient
 {
-    static let restApiKey = "3f4a09fbe71e8da37fa44bafa8d94749"
+    static let restApiKey = ""
     
     enum Endpoints {
         static let base = "https://api.flickr.com/services/rest/"
