@@ -64,13 +64,11 @@ extension TravelLocationMapViewController: MKMapViewDelegate {
     @objc func checkAction(_ gestureRecognizer: UILongPressGestureRecognizer) {
 
         if gestureRecognizer.state == .began {
-            print("click")
             
             let touchLocation = gestureRecognizer.location(in: mapView)
             let locationCoordinate = mapView.convert(touchLocation, toCoordinateFrom: mapView)
             let click_latitude = locationCoordinate.latitude
             let click_longitude = locationCoordinate.longitude
-            print("Tapped at lat: \(click_latitude) long: \(click_longitude)")
 
             DispatchQueue.main.async(execute: {
                 let annotation = MKPointAnnotation()

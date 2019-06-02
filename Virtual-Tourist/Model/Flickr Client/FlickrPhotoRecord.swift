@@ -19,7 +19,7 @@ struct FlickrPhotoRecord : Codable {
     let ispublic : Int?
     let isfriend : Int?
     let isfamily : Int?
-    let url_t : String
+    let url_s : String
     let height_t : String?
     let width_t : String?
     
@@ -34,7 +34,7 @@ struct FlickrPhotoRecord : Codable {
         case ispublic
         case isfriend
         case isfamily
-        case url_t
+        case url_s
         case height_t
         case width_t
     }

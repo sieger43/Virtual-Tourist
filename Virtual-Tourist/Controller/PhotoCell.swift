@@ -11,4 +11,11 @@ import UIKit
 class PhotoCell: UICollectionViewCell {
 
     @IBOutlet weak var imageView: UIImageView!
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        //imageView = nil
+        
+    }
 }

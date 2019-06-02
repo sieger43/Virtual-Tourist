@@ -29,16 +29,16 @@ class FlickrClient
         
     }
     
-    class func getPhotoList(completion: @escaping (Bool, Error?, FlickrSearchResponse?) -> Void) {
+    class func getPhotoList(lat: Double, lon: Double, completion: @escaping (Bool, Error?, FlickrSearchResponse?) -> Void) {
         
         let qItems = [URLQueryItem(name: "method", value: "flickr.photos.search"),
                       URLQueryItem(name: "api_key", value: restApiKey),
                       URLQueryItem(name: "format", value: "json"),
                       URLQueryItem(name: "nojsoncallback", value: "1"),
-                      URLQueryItem(name: "lat", value: "43.204940"),
-                      URLQueryItem(name: "lon", value: "-77.691951"),
+                      URLQueryItem(name: "lat", value: String(lat)),
+                      URLQueryItem(name: "lon", value: String(lon)),
                       URLQueryItem(name: "per_page", value: "21"),
-                      URLQueryItem(name: "extras", value: "url_t")]
+                      URLQueryItem(name: "extras", value: "url_s")]
         
         //+ "?method=flickr.photos.search&format=json&nojsoncallback=1&api_key=" + restApiKey
         // FlickrClient.getPhotoList(completion: FlickrClient.handleFlickrSearchResponse)
@@ -47,13 +47,12 @@ class FlickrClient
             if let response = response {
                 completion(true, nil, response)
             } else {
-                print("false FlickrSearchResponse")
                 completion(false, error, nil)
             }
         }
     }
     
-    class func taskForGETRequest<ResponseType: Decodable>(url: URL, queryItems: [URLQueryItem], responseType: ResponseType.Type, completion: @escaping (ResponseType?, Error?) -> Void) -> URLSessionDataTask {
+    class func taskForGETRequest<ResponseType: Decodable>(url: URL, queryItems: [URLQueryItem], responseType: ResponseType.Type, completion: @escaping (ResponseType?, Error?) -> Void) {
         
         var finalURL:URL = url;
         
@@ -66,8 +65,6 @@ class FlickrClient
             finalURL = urlWithQuery
         }
         
-        print(finalURL)
-        
         let request = URLRequest(url: finalURL)
         // The default HTTP method for URLRequest is “GET”.
         
@@ -78,15 +75,11 @@ class FlickrClient
                 }
                 return
             }
-            
-            print(data.description)
-            
+   
             let decoder = JSONDecoder()
             do {
                 let responseObject = try decoder.decode(ResponseType.self, from: data)
                 DispatchQueue.main.async {
-                    
-                    
                     
                     completion(responseObject, nil)
                 }
@@ -104,7 +97,5 @@ class FlickrClient
             }
         }
         task.resume()
-        
-        return task
     }
 }
