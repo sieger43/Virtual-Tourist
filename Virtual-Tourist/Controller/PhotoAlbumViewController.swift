@@ -51,7 +51,7 @@ class PhotoAlbumViewController: UIViewController {
                     
                     DispatchQueue.main.async(execute: {
                         for photoRecord in thedata {
-                            
+
                             let url = URL(string: photoRecord.url_s)
                             
                             if let unwrapped_URL = url {

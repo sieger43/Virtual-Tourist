@@ -10,7 +10,7 @@ import Foundation
 
 class FlickrClient
 {
-    static let restApiKey = ""
+    static let restApiKey = "3f4a09fbe71e8da37fa44bafa8d94749"
     
     enum Endpoints {
         static let base = "https://api.flickr.com/services/rest/"
@@ -31,12 +31,23 @@ class FlickrClient
     
     class func getPhotoList(lat: Double, lon: Double, completion: @escaping (Bool, Error?, FlickrSearchResponse?) -> Void) {
         
+        var randomMonth: String = String(Int.random(in: 1 ... 12))
+        
+        if randomMonth.count == 1 {
+            randomMonth = "0" + randomMonth;
+        }
+        
+        let randomYear: String = String(Int.random (in: 2006 ... 2018))
+        
+        let dateString : String = randomYear + "-" + randomMonth
+        
         let qItems = [URLQueryItem(name: "method", value: "flickr.photos.search"),
                       URLQueryItem(name: "api_key", value: restApiKey),
                       URLQueryItem(name: "format", value: "json"),
                       URLQueryItem(name: "nojsoncallback", value: "1"),
                       URLQueryItem(name: "lat", value: String(lat)),
                       URLQueryItem(name: "lon", value: String(lon)),
+                      URLQueryItem(name: "max_upload_date", value: dateString),
                       URLQueryItem(name: "per_page", value: "21"),
                       URLQueryItem(name: "extras", value: "url_s")]
         

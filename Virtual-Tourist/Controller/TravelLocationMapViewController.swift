@@ -9,10 +9,15 @@
 import UIKit
 import MapKit
 import Foundation
+import CoreData
 
 class TravelLocationMapViewController: UIViewController {
 
     @IBOutlet weak var mapView: MKMapView!
+    
+    var pins : [Pin] = []
+    
+    var dataController:DataController!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,6 +25,12 @@ class TravelLocationMapViewController: UIViewController {
         mapView.delegate = self
         let tap = UILongPressGestureRecognizer(target: self, action: #selector(self.checkAction))
         mapView.addGestureRecognizer(tap)
+
+        
+        let fetchRequest:NSFetchRequest<Pin> = Pin.fetchRequest();
+        if let result = try? dataController.viewContext.fetch(fetchRequest) {
+            pins = result
+        }
     }
 
     @objc func handleTap(sender: UITapGestureRecognizer? = nil) {
@@ -53,11 +64,21 @@ extension TravelLocationMapViewController: MKMapViewDelegate {
         navigationItem.backBarButtonItem = backItem
         
         if let annotation = view.annotation {
-            
+
             photoViewController.lat = annotation.coordinate.latitude;
             photoViewController.lon = annotation.coordinate.longitude;
             
-            self.navigationController!.pushViewController(photoViewController, animated: true)
+            DispatchQueue.main.async(execute: {
+
+                if let annotation = view.annotation {
+                    // the selection of the pin doesn't automatically clear and
+                    // prevents the pin from being selected twice in a row; deselect
+                    // all the pins here
+                    mapView.deselectAnnotation(annotation, animated: false)
+                }
+                
+                self.navigationController!.pushViewController(photoViewController, animated: true)
+            })
         }
     }
 
