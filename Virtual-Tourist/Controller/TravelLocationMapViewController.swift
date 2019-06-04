@@ -30,12 +30,31 @@ class TravelLocationMapViewController: UIViewController {
         let fetchRequest:NSFetchRequest<Pin> = Pin.fetchRequest();
         if let result = try? dataController.viewContext.fetch(fetchRequest) {
             pins = result
+            refreshMapPins()
         }
     }
 
     @objc func handleTap(sender: UITapGestureRecognizer? = nil) {
         // handling code
     }
+    
+    func addPin(click_latitude: Double, click_longitude: Double) {
+        
+        let mapPin = Pin(context: dataController.viewContext)
+        mapPin.latitude = click_latitude;
+        mapPin.longitude = click_longitude;
+        try? dataController.viewContext.save()
+        pins.append(mapPin)
+    }
+    
+    /// Deletes the notebook at the specified index path
+/*
+    func deleteNotebook(at indexPath: IndexPath) {
+        let notebookToDelete = fetchedResultsController.object(at: indexPath)
+        dataController.viewContext.delete(notebookToDelete)
+        try? dataController.viewContext.save()
+    }
+ */
 }
 
 extension TravelLocationMapViewController: MKMapViewDelegate {
@@ -88,14 +107,35 @@ extension TravelLocationMapViewController: MKMapViewDelegate {
             
             let touchLocation = gestureRecognizer.location(in: mapView)
             let locationCoordinate = mapView.convert(touchLocation, toCoordinateFrom: mapView)
-            let click_latitude = locationCoordinate.latitude
-            let click_longitude = locationCoordinate.longitude
+            let lat = locationCoordinate.latitude
+            let lon = locationCoordinate.longitude
 
+            addPin(click_latitude: lat, click_longitude: lon)
+            
             DispatchQueue.main.async(execute: {
                 let annotation = MKPointAnnotation()
-                annotation.coordinate = CLLocationCoordinate2D(latitude: click_latitude, longitude: click_longitude)
+                annotation.coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
                 self.mapView.addAnnotation(annotation)
             })
         }
+    }
+    
+    func refreshMapPins() {
+        
+        DispatchQueue.main.async(execute: {
+            self.mapView.removeAnnotations(self.mapView.annotations)
+            
+            for pin in self.pins {
+                let lat = pin.latitude
+                let lon = pin.longitude
+                    
+                let mapAnnotation = MKPointAnnotation()
+                
+                mapAnnotation.coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+                
+                self.mapView.addAnnotation(mapAnnotation)
+            }
+        })
+        
     }
 }
