@@ -34,6 +34,8 @@ class PhotoAlbumViewController: UIViewController {
     }
 
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
         VirtualTouristModel.images.removeAll()
 
         collectionView.dataSource = self

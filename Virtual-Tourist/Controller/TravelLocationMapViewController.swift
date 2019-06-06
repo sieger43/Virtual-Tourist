@@ -15,6 +15,14 @@ class TravelLocationMapViewController: UIViewController {
 
     @IBOutlet weak var mapView: MKMapView!
     
+    @IBOutlet weak var tapPinsToDeleteButton: UIButton!
+    
+    @IBOutlet weak var mapViewBottomConstraint: NSLayoutConstraint!
+    
+    @IBOutlet weak var editButton: UIBarButtonItem!
+    
+    var inEditMode = false;
+    
     var pins : [Pin] = []
     
     var dataController:DataController!
@@ -32,8 +40,34 @@ class TravelLocationMapViewController: UIViewController {
             pins = result
             refreshMapPins()
         }
+        
+        if let button = tapPinsToDeleteButton {
+            button.isHidden = true;
+        }
     }
 
+    @IBAction func editPin(_ sender: Any) {
+        
+        if let constraint = mapViewBottomConstraint,
+            let button = tapPinsToDeleteButton,
+            let edit = editButton {
+            
+            if inEditMode {
+                button.isHidden = true
+                edit.title = "Edit"
+                constraint.constant += button.frame.height;
+                inEditMode = false
+                
+            } else {
+                button.isHidden = false
+                edit.title = "Done"
+                constraint.constant -= button.frame.height;
+                inEditMode = true
+            }
+
+        }
+    }
+    
     @objc func handleTap(sender: UITapGestureRecognizer? = nil) {
         // handling code
     }
@@ -45,6 +79,29 @@ class TravelLocationMapViewController: UIViewController {
         mapPin.longitude = click_longitude;
         try? dataController.viewContext.save()
         pins.append(mapPin)
+    }
+    
+    func deletePin(click_latitude: Double, click_longitude: Double) {
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
+        let latPredicate = NSPredicate(format: "latitude = %@", argumentArray: [click_latitude])
+        let lonPredicate = NSPredicate(format: "longitude = %@", argumentArray: [click_longitude])
+        let andPredicate = NSCompoundPredicate(type: .and, subpredicates: [latPredicate, lonPredicate])
+        
+        fetch.predicate = andPredicate
+
+        do {
+            
+            let result = try dataController.viewContext.fetch(fetch)
+            
+            if result.count == 1 {
+                let p : Pin = result[0] as! Pin
+                dataController.viewContext.delete(p)
+                try? dataController.viewContext.save()
+            }
+        } catch {
+            print("Failed")
+        }
+        
     }
     
     /// Deletes the notebook at the specified index path
@@ -78,26 +135,39 @@ extension TravelLocationMapViewController: MKMapViewDelegate {
                  didSelect view: MKAnnotationView) {
         let photoViewController = self.storyboard!.instantiateViewController(withIdentifier: "PhotoAlbumViewController") as! PhotoAlbumViewController
         
-        let backItem = UIBarButtonItem()
-        backItem.title = "OK"
-        navigationItem.backBarButtonItem = backItem
-        
-        if let annotation = view.annotation {
-
-            photoViewController.lat = annotation.coordinate.latitude;
-            photoViewController.lon = annotation.coordinate.longitude;
+        if inEditMode {
             
-            DispatchQueue.main.async(execute: {
-
-                if let annotation = view.annotation {
-                    // the selection of the pin doesn't automatically clear and
-                    // prevents the pin from being selected twice in a row; deselect
-                    // all the pins here
-                    mapView.deselectAnnotation(annotation, animated: false)
-                }
+            if let annotation = view.annotation {
+                deletePin(click_latitude: annotation.coordinate.latitude,
+                      click_longitude: annotation.coordinate.longitude)
                 
-                self.navigationController!.pushViewController(photoViewController, animated: true)
-            })
+                self.mapView.removeAnnotation(annotation)
+                refreshMapPins()
+            }
+            
+        } else {
+        
+            let backItem = UIBarButtonItem()
+            backItem.title = "OK"
+            navigationItem.backBarButtonItem = backItem
+        
+            if let annotation = view.annotation {
+
+                photoViewController.lat = annotation.coordinate.latitude;
+                photoViewController.lon = annotation.coordinate.longitude;
+                
+                DispatchQueue.main.async(execute: {
+
+                    if let annotation = view.annotation {
+                        // the selection of the pin doesn't automatically clear and
+                        // prevents the pin from being selected twice in a row; deselect
+                        // all the pins here
+                        mapView.deselectAnnotation(annotation, animated: false)
+                    }
+                    
+                    self.navigationController!.pushViewController(photoViewController, animated: true)
+                })
+            }
         }
     }
 

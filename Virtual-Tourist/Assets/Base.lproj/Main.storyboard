@@ -19,26 +19,47 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="2bN-sB-5no">
-                                <rect key="frame" x="0.0" y="88" width="414" height="774"/>
+                                <rect key="frame" x="0.0" y="88" width="414" height="756"/>
                             </mapView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j9X-ud-0lz">
+                                <rect key="frame" x="0.0" y="776" width="414" height="68"/>
+                                <color key="backgroundColor" red="1" green="0.14913141730000001" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <state key="normal" title="Tap Pins to Delete">
+                                    <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="2bN-sB-5no" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Q0I-zc-9KL"/>
-                            <constraint firstItem="2bN-sB-5no" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="adX-zT-iwR"/>
-                            <constraint firstItem="2bN-sB-5no" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="mv6-hE-TTg"/>
-                            <constraint firstItem="2bN-sB-5no" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="t56-vI-Zbb"/>
+                            <constraint firstItem="2bN-sB-5no" firstAttribute="bottom" secondItem="j9X-ud-0lz" secondAttribute="bottom" id="2yC-Aa-iuY"/>
+                            <constraint firstItem="2bN-sB-5no" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="5Tz-jL-0Mp"/>
+                            <constraint firstItem="2bN-sB-5no" firstAttribute="leading" secondItem="j9X-ud-0lz" secondAttribute="leading" id="5tt-mq-nH6"/>
+                            <constraint firstAttribute="trailing" secondItem="2bN-sB-5no" secondAttribute="trailing" id="7ar-Kj-9nn"/>
+                            <constraint firstItem="2bN-sB-5no" firstAttribute="trailing" secondItem="j9X-ud-0lz" secondAttribute="trailing" id="RSP-zX-PR0"/>
+                            <constraint firstItem="2bN-sB-5no" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="aEj-Vi-xpQ"/>
+                            <constraint firstItem="j9X-ud-0lz" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="688" id="aWq-2p-3yZ"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="j9X-ud-0lz" secondAttribute="bottom" constant="18" id="nnt-WC-k2X"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Virtual Tourist" id="cdX-Uy-wMc"/>
+                    <navigationItem key="navigationItem" title="Virtual Tourist" id="cdX-Uy-wMc">
+                        <barButtonItem key="rightBarButtonItem" title="Edit" id="SzV-z2-87u">
+                            <connections>
+                                <action selector="editPin:" destination="BYZ-38-t0r" id="hNE-3L-Mjf"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
+                        <outlet property="editButton" destination="SzV-z2-87u" id="NqM-Eh-O67"/>
                         <outlet property="mapView" destination="2bN-sB-5no" id="CvS-dh-flr"/>
+                        <outlet property="mapViewBottomConstraint" destination="2yC-Aa-iuY" id="Kx5-Wk-zd9"/>
+                        <outlet property="tapPinsToDeleteButton" destination="j9X-ud-0lz" id="2cj-ze-ncC"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1700.625" y="30.633802816901408"/>
+            <point key="canvasLocation" x="1700.0000000000002" y="30.133928571428569"/>
         </scene>
         <!--Photo Album View Controller-->
         <scene sceneID="GBH-PY-bbQ">
