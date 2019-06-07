@@ -99,19 +99,10 @@ class TravelLocationMapViewController: UIViewController {
                 try? dataController.viewContext.save()
             }
         } catch {
-            print("Failed")
+            let _ = "deletePin() Failed"
         }
         
     }
-    
-    /// Deletes the notebook at the specified index path
-/*
-    func deleteNotebook(at indexPath: IndexPath) {
-        let notebookToDelete = fetchedResultsController.object(at: indexPath)
-        dataController.viewContext.delete(notebookToDelete)
-        try? dataController.viewContext.save()
-    }
- */
 }
 
 extension TravelLocationMapViewController: MKMapViewDelegate {
@@ -155,6 +146,7 @@ extension TravelLocationMapViewController: MKMapViewDelegate {
 
                 photoViewController.lat = annotation.coordinate.latitude;
                 photoViewController.lon = annotation.coordinate.longitude;
+                photoViewController.dataController = self.dataController
                 
                 DispatchQueue.main.async(execute: {
 

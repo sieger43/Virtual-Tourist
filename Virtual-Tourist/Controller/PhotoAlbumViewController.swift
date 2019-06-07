@@ -9,6 +9,7 @@ import CoreLocation
 import Foundation
 import MapKit
 import UIKit
+import CoreData
 
 class VirtualTouristModel {
     
@@ -22,6 +23,8 @@ class PhotoAlbumViewController: UIViewController {
     
     var lat:Double = 0.0;
     var lon:Double = 0.0;
+    
+    var dataController:DataController!
     
     @IBOutlet weak var mapView: MKMapView!
     
@@ -45,42 +48,95 @@ class PhotoAlbumViewController: UIViewController {
     }
 
     func refreshPhotoList() {
+ 
+        var haveCachedPhotos = false;
         
-        FlickrClient.getPhotoList(lat: lat, lon: lon){ success, error, response in
-            if success {
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
+        let latPredicate = NSPredicate(format: "latitude = %@", argumentArray: [lat])
+        let lonPredicate = NSPredicate(format: "longitude = %@", argumentArray: [lon])
+        let andPredicate = NSCompoundPredicate(type: .and, subpredicates: [latPredicate, lonPredicate])
+        
+        fetch.predicate = andPredicate
+        
+        var mapPin : Pin? = nil
+        
+        do {
+            let result = try dataController.viewContext.fetch(fetch)
+            
+            if result.count == 1 {
+                let p : Pin = result[0] as! Pin
                 
-                if let thedata = response?.photos.photo {
-                    
-                    DispatchQueue.main.async(execute: {
-                        for photoRecord in thedata {
-
-                            let url = URL(string: photoRecord.url_s)
-                            
-                            if let unwrapped_URL = url {
-                                
-                                
-                                do {
-                                    let imageData = try Data(contentsOf: unwrapped_URL)
-                                    if let image = UIImage(data: imageData) {
-                                        VirtualTouristModel.images.append(image)
-                                    }
-                                } catch {
-                                    // empty
-                                }
+                mapPin = p
+                
+                if let theSet = p.photos {
+                    let numPhotos = theSet.count
+                    if numPhotos == 0 {
+                        haveCachedPhotos = false
+                    } else {
+                        for case let photo as Photo in theSet  {
+                            if let imageData = photo.imageData, let image = UIImage(data: imageData) {
+                                VirtualTouristModel.images.append(image)
                             }
                         }
-
+                        haveCachedPhotos = true
+                        
                         self.centerMapOnLocation()
                         self.collectionView?.reloadData()
-                    })
+                    }
                 }
-                
-            } else {
-                let _ = error?.localizedDescription ?? ""
+           }
+        } catch {
+            let _ = "refreshPhotoList() Failed"
+        }
+        
+        if !haveCachedPhotos {
+
+            FlickrClient.getPhotoList(lat: lat, lon: lon){ success, error, response in
+                if success {
+                    
+                    if let thedata = response?.photos.photo {
+                        
+                        DispatchQueue.main.async(execute: {
+                            for photoRecord in thedata {
+                                
+                                let url = URL(string: photoRecord.url_s)
+                                
+                                if let unwrapped_URL = url {
+
+                                    do {
+                                        let imageData = try Data(contentsOf: unwrapped_URL)
+                                        if let image = UIImage(data: imageData) {
+                                            VirtualTouristModel.images.append(image)
+                                        }
+                                    } catch {
+                                        // empty
+                                    }
+                                }
+                            }
+                            
+                            if !haveCachedPhotos {
+                                if let p = mapPin {
+                                    for pic in VirtualTouristModel.images {
+                                        let d = pic.pngData()
+                                        let photo = Photo(context: self.dataController.viewContext)
+                                        photo.imageData = d
+                                        p.addToPhotos(photo)
+                                    }
+                                    try? self.dataController.viewContext.save()
+                                }
+                            }
+                            
+                            self.centerMapOnLocation()
+                            self.collectionView?.reloadData()
+                        })
+                    }
+                    
+                } else {
+                    let _ = error?.localizedDescription ?? ""
+                }
             }
         }
     }
-    
     
     private func centerMapOnLocation() {
         // from https://stackoverflow.com/questions/41639478/mkmapview-center-and-zoom-in?rq=1
