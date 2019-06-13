@@ -13,7 +13,7 @@ import CoreData
 
 class VirtualTouristModel {
     
-    static var images = [UIImage]()
+    static var images = [PhotoView]()
     
 }
 
@@ -73,11 +73,16 @@ class PhotoAlbumViewController: UIViewController {
                     if numPhotos == 0 {
                         haveCachedPhotos = false
                     } else {
+                        
                         for case let photo as Photo in theSet  {
-                            if let imageData = photo.imageData, let image = UIImage(data: imageData) {
-                                VirtualTouristModel.images.append(image)
+                            if let imageData = photo.imageData, let image = UIImage(data: imageData),
+                                let photoTitle = photo.title {
+                                VirtualTouristModel.images.append(PhotoView(photo: image, title: photoTitle))
                             }
                         }
+                        
+                        VirtualTouristModel.images.sort(by: { $0.title > $1.title })
+                        
                         haveCachedPhotos = true
                         
                         self.centerMapOnLocation()
@@ -101,12 +106,12 @@ class PhotoAlbumViewController: UIViewController {
                                 
                                 let url = URL(string: photoRecord.url_s)
                                 
-                                if let unwrapped_URL = url {
+                                if let unwrapped_URL = url, let photoTitle =  photoRecord.title {
 
                                     do {
                                         let imageData = try Data(contentsOf: unwrapped_URL)
                                         if let image = UIImage(data: imageData) {
-                                            VirtualTouristModel.images.append(image)
+                                            VirtualTouristModel.images.append(PhotoView(photo: image, title: photoTitle))
                                         }
                                     } catch {
                                         // empty
@@ -114,13 +119,18 @@ class PhotoAlbumViewController: UIViewController {
                                 }
                             }
                             
+                            VirtualTouristModel.images.sort(by: { $0.title > $1.title })
+                            
                             if !haveCachedPhotos {
                                 if let p = mapPin {
-                                    for pic in VirtualTouristModel.images {
-                                        let d = pic.pngData()
-                                        let photo = Photo(context: self.dataController.viewContext)
-                                        photo.imageData = d
-                                        p.addToPhotos(photo)
+                                    for photoView in VirtualTouristModel.images {
+                                        if let pic = photoView.photo  {
+                                            let d = pic.pngData()
+                                            let photo = Photo(context: self.dataController.viewContext)
+                                            photo.imageData = d
+                                            photo.title = photoView.title
+                                            p.addToPhotos(photo)
+                                        }
                                     }
                                     try? self.dataController.viewContext.save()
                                 }
@@ -216,13 +226,16 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier,
                                                       for: indexPath) as! PhotoCell
        
-        var photo = VirtualTouristModel.images[indexPath.row]
+        let photoView = VirtualTouristModel.images[indexPath.row]
         
-        photo = cropToBounds(image: photo)
-        
-        cell.backgroundColor = .white
-
-        cell.imageView.image = photo
+        if let photo = photoView.photo {
+            
+            let croppedPhoto = cropToBounds(image: photo)
+            
+            cell.backgroundColor = .white
+            
+            cell.imageView.image = croppedPhoto
+        }
         
         return cell
     }
