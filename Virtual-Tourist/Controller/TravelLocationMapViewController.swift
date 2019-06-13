@@ -165,7 +165,7 @@ extension TravelLocationMapViewController: MKMapViewDelegate {
 
     @objc func checkAction(_ gestureRecognizer: UILongPressGestureRecognizer) {
 
-        if gestureRecognizer.state == .began {
+        if gestureRecognizer.state == .began && !inEditMode {
             
             let touchLocation = gestureRecognizer.location(in: mapView)
             let locationCoordinate = mapView.convert(touchLocation, toCoordinateFrom: mapView)
