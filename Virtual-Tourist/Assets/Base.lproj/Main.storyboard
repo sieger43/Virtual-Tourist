@@ -76,11 +76,12 @@
                                 </constraints>
                             </mapView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7xa-mj-eUx">
-                                <rect key="frame" x="0.0" y="832" width="414" height="30"/>
-                                <state key="normal" title="Button"/>
+                                <rect key="frame" x="0.0" y="828" width="414" height="34"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <state key="normal" title="New Collection"/>
                             </button>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="DM6-l3-xSG">
-                                <rect key="frame" x="0.0" y="210" width="414" height="614"/>
+                                <rect key="frame" x="0.0" y="210" width="414" height="610"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="N69-TP-5xq">
                                     <size key="itemSize" width="127" height="101"/>
@@ -97,7 +98,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="84w-QE-ERN">
-                                                    <rect key="frame" x="9" y="0.0" width="118" height="101"/>
+                                                    <rect key="frame" x="0.0" y="-9" width="137" height="120"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 </imageView>
                                             </subviews>
@@ -127,6 +128,7 @@
                     <connections>
                         <outlet property="collectionView" destination="DM6-l3-xSG" id="LNa-sG-Bef"/>
                         <outlet property="mapView" destination="GJd-wh-QP9" id="aDF-qF-yQ3"/>
+                        <outlet property="newCollectionButton" destination="7xa-mj-eUx" id="hGW-2r-KEL"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0HG-k5-HZO" userLabel="First Responder" sceneMemberID="firstResponder"/>

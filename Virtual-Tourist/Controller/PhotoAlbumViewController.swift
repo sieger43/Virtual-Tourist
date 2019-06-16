@@ -26,6 +26,8 @@ class PhotoAlbumViewController: UIViewController {
     
     var dataController:DataController!
     
+    @IBOutlet weak var newCollectionButton: UIButton!
+    
     @IBOutlet weak var mapView: MKMapView!
     
     @IBOutlet weak var collectionView: UICollectionView!
@@ -42,6 +44,8 @@ class PhotoAlbumViewController: UIViewController {
         VirtualTouristModel.images.removeAll()
 
         collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.allowsMultipleSelection = true
         mapView.delegate = self
         
         refreshPhotoList()
@@ -218,7 +222,7 @@ extension PhotoAlbumViewController: MKMapViewDelegate {
     }
 }
 
-extension PhotoAlbumViewController: UICollectionViewDataSource {
+extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
 
         return VirtualTouristModel.images.count
@@ -241,5 +245,28 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
         
         return cell
     }
+    
+    func updateButtonTitle(collectionView: UICollectionView) {
+        if let button = self.newCollectionButton, let selectedItems = collectionView.indexPathsForSelectedItems {
+            if selectedItems.count > 0 {
+                button.setTitle("Remove Selected Pictures", for: .normal)
+            } else {
+                button.setTitle("New Collection", for: .normal)
+            }
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let selectedCell:UICollectionViewCell = collectionView.cellForItem(at: indexPath)!
+        selectedCell.alpha = 0.5
+        
+        updateButtonTitle(collectionView: collectionView)
+    }
 
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        let selectedCell:UICollectionViewCell = collectionView.cellForItem(at: indexPath)!
+        selectedCell.alpha = 1.0
+
+        updateButtonTitle(collectionView: collectionView)
+    }
 }
