@@ -43,6 +43,10 @@ class PhotoAlbumViewController: UIViewController {
         
         VirtualTouristModel.images.removeAll()
 
+        for i: Int32 in 1...21 {
+            VirtualTouristModel.images.append(PhotoView(photo: UIImage(named: "busyCell" ), index: i))
+        }
+        
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.allowsMultipleSelection = true
@@ -54,6 +58,8 @@ class PhotoAlbumViewController: UIViewController {
     func refreshPhotoList() {
  
         var haveCachedPhotos = false;
+        
+        self.centerMapOnLocation()
         
         let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
         let latPredicate = NSPredicate(format: "latitude = %@", argumentArray: [lat])
@@ -78,6 +84,8 @@ class PhotoAlbumViewController: UIViewController {
                         haveCachedPhotos = false
                     } else {
                        
+                        VirtualTouristModel.images.removeAll()
+                        
                         for case let photo as Photo in theSet  {
                             if let imageData = photo.imageData, let image = UIImage(data: imageData) {
                                 VirtualTouristModel.images.append(PhotoView(photo: image, index: photo.index))
@@ -87,8 +95,7 @@ class PhotoAlbumViewController: UIViewController {
                         VirtualTouristModel.images.sort(by: { $0.index > $1.index })
                         
                         haveCachedPhotos = true
-                        
-                        self.centerMapOnLocation()
+ 
                         self.collectionView?.reloadData()
                     }
                 }
@@ -96,37 +103,37 @@ class PhotoAlbumViewController: UIViewController {
         } catch {
             let _ = "refreshPhotoList() Failed"
         }
-        
+
         if !haveCachedPhotos {
 
-            FlickrClient.getPhotoList(lat: lat, lon: lon){ success, error, response in
+           FlickrClient.getPhotoList(lat: lat, lon: lon){ success, error, response in
                 if success {
-                    
+
                     var index: Int32 = 0;
                     
                     if let thedata = response?.photos.photo {
                         
-                        DispatchQueue.main.async(execute: {
-                            for photoRecord in thedata {
-                                
-                                let url = URL(string: photoRecord.url_s)
-                                
-                                if let unwrapped_URL = url{
+                        DispatchQueue.global().async(execute: {
+                            VirtualTouristModel.images.removeAll()
 
+                            for photoRecord in thedata {
+                                if let unwrapped_URL = URL(string: photoRecord.url_s){
                                     do {
                                         let imageData = try Data(contentsOf: unwrapped_URL)
                                         if let image = UIImage(data: imageData) {
                                             VirtualTouristModel.images.append(PhotoView(photo: image, index: index))
                                             index = index  + 1
+                                            DispatchQueue.main.async(execute: {
+                                                VirtualTouristModel.images.sort(by: { $0.index > $1.index })
+                                                self.collectionView?.reloadData()
+                                            })
                                         }
                                     } catch {
                                         // empty
                                     }
                                 }
                             }
-                            
-                            VirtualTouristModel.images.sort(by: { $0.index > $1.index })
-                            
+
                             if !haveCachedPhotos {
                                 if let p = mapPin {
                                     for photoView in VirtualTouristModel.images {
@@ -141,9 +148,6 @@ class PhotoAlbumViewController: UIViewController {
                                     try? self.dataController.viewContext.save()
                                 }
                             }
-                            
-                            self.centerMapOnLocation()
-                            self.collectionView?.reloadData()
                         })
                     }
                     
