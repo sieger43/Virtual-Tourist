@@ -73,15 +73,14 @@ class PhotoAlbumViewController: UIViewController {
                     if numPhotos == 0 {
                         haveCachedPhotos = false
                     } else {
-                        
+                       
                         for case let photo as Photo in theSet  {
-                            if let imageData = photo.imageData, let image = UIImage(data: imageData),
-                                let photoTitle = photo.title {
-                                VirtualTouristModel.images.append(PhotoView(photo: image, title: photoTitle))
+                            if let imageData = photo.imageData, let image = UIImage(data: imageData) {
+                                VirtualTouristModel.images.append(PhotoView(photo: image, index: photo.index))
                             }
                         }
                         
-                        VirtualTouristModel.images.sort(by: { $0.title > $1.title })
+                        VirtualTouristModel.images.sort(by: { $0.index > $1.index })
                         
                         haveCachedPhotos = true
                         
@@ -99,6 +98,8 @@ class PhotoAlbumViewController: UIViewController {
             FlickrClient.getPhotoList(lat: lat, lon: lon){ success, error, response in
                 if success {
                     
+                    var index: Int32 = 0;
+                    
                     if let thedata = response?.photos.photo {
                         
                         DispatchQueue.main.async(execute: {
@@ -106,12 +107,13 @@ class PhotoAlbumViewController: UIViewController {
                                 
                                 let url = URL(string: photoRecord.url_s)
                                 
-                                if let unwrapped_URL = url, let photoTitle =  photoRecord.title {
+                                if let unwrapped_URL = url{
 
                                     do {
                                         let imageData = try Data(contentsOf: unwrapped_URL)
                                         if let image = UIImage(data: imageData) {
-                                            VirtualTouristModel.images.append(PhotoView(photo: image, title: photoTitle))
+                                            VirtualTouristModel.images.append(PhotoView(photo: image, index: index))
+                                            index = index  + 1
                                         }
                                     } catch {
                                         // empty
@@ -119,7 +121,7 @@ class PhotoAlbumViewController: UIViewController {
                                 }
                             }
                             
-                            VirtualTouristModel.images.sort(by: { $0.title > $1.title })
+                            VirtualTouristModel.images.sort(by: { $0.index > $1.index })
                             
                             if !haveCachedPhotos {
                                 if let p = mapPin {
@@ -128,7 +130,7 @@ class PhotoAlbumViewController: UIViewController {
                                             let d = pic.pngData()
                                             let photo = Photo(context: self.dataController.viewContext)
                                             photo.imageData = d
-                                            photo.title = photoView.title
+                                            photo.index = photoView.index
                                             p.addToPhotos(photo)
                                         }
                                     }

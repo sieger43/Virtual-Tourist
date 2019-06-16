@@ -11,20 +11,20 @@ import UIKit
 
 class PhotoView
 {
-    init(photo:UIImage?, title:String)
+    init(photo:UIImage?, index:Int32)
     {
         self.photo = photo
-        self.title = title
+        self.index = index
     }
     
     convenience init(photo:UIImage?) {
-        self.init(photo: photo, title: "")
+        self.init(photo: photo, index: -1)
     }
     
     convenience init() {
-        self.init(photo: nil, title: "")
+        self.init(photo: nil, index: -1)
     }
     
     var photo:UIImage?
-    var title:String
+    var index:Int32
 }
