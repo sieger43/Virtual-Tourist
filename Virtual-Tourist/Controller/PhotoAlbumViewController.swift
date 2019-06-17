@@ -32,6 +32,29 @@ class PhotoAlbumViewController: UIViewController {
     
     @IBOutlet weak var collectionView: UICollectionView!
     
+    
+    @IBAction func doButtonTask(_ sender: Any) {
+        if let button = self.newCollectionButton, let selectedItems = collectionView.indexPathsForSelectedItems {
+            
+            if let title = newCollectionButton.currentTitle {
+                if title == "Remove Selected Pictures" {
+                    
+                } else if title == "New Collection" {
+                    VirtualTouristModel.images.removeAll()
+                    
+                    for i: Int32 in 1...21 {
+                        VirtualTouristModel.images.append(PhotoView(photo: UIImage(named: "busyCell" ), index: i))
+                    }
+                    
+                    refreshPhotoList(forceRefresh: true)
+
+                }
+                
+                
+            }
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -52,10 +75,10 @@ class PhotoAlbumViewController: UIViewController {
         collectionView.allowsMultipleSelection = true
         mapView.delegate = self
         
-        refreshPhotoList()
+        refreshPhotoList(forceRefresh: false)
     }
 
-    func refreshPhotoList() {
+    func refreshPhotoList(forceRefresh : Bool) {
  
         var haveCachedPhotos = false;
         
@@ -67,36 +90,45 @@ class PhotoAlbumViewController: UIViewController {
         let andPredicate = NSCompoundPredicate(type: .and, subpredicates: [latPredicate, lonPredicate])
         
         fetch.predicate = andPredicate
-        
-        var mapPin : Pin? = nil
+
+        var mapPin : Pin = Pin(context: dataController.persistentContainer.newBackgroundContext())
         
         do {
             let result = try dataController.viewContext.fetch(fetch)
             
             if result.count == 1 {
-                let p : Pin = result[0] as! Pin
+                mapPin = result[0] as! Pin
                 
-                mapPin = p
-                
-                if let theSet = p.photos {
-                    let numPhotos = theSet.count
-                    if numPhotos == 0 {
-                        haveCachedPhotos = false
-                    } else {
-                       
-                        VirtualTouristModel.images.removeAll()
-                        
-                        for case let photo as Photo in theSet  {
-                            if let imageData = photo.imageData, let image = UIImage(data: imageData) {
-                                VirtualTouristModel.images.append(PhotoView(photo: image, index: photo.index))
+                if forceRefresh {
+                    
+                    for photo in mapPin.photos! as! Set<Photo> {
+                        dataController.viewContext.delete(photo)
+                    }
+
+                    try? self.dataController.viewContext.save()
+                    
+                } else {
+
+                    if let theSet = mapPin.photos {
+                        let numPhotos = theSet.count
+                        if numPhotos == 0 {
+                            haveCachedPhotos = false
+                        } else {
+                           
+                            VirtualTouristModel.images.removeAll()
+                            
+                            for case let photo as Photo in theSet  {
+                                if let imageData = photo.imageData, let image = UIImage(data: imageData) {
+                                    VirtualTouristModel.images.append(PhotoView(photo: image, index: photo.index))
+                                }
                             }
+                            
+                            VirtualTouristModel.images.sort(by: { $0.index > $1.index })
+                            
+                            haveCachedPhotos = true
+     
+                            self.collectionView?.reloadData()
                         }
-                        
-                        VirtualTouristModel.images.sort(by: { $0.index > $1.index })
-                        
-                        haveCachedPhotos = true
- 
-                        self.collectionView?.reloadData()
                     }
                 }
            }
@@ -133,20 +165,19 @@ class PhotoAlbumViewController: UIViewController {
                                     }
                                 }
                             }
-
+                            
                             if !haveCachedPhotos {
-                                if let p = mapPin {
+
                                     for photoView in VirtualTouristModel.images {
                                         if let pic = photoView.photo  {
                                             let d = pic.pngData()
                                             let photo = Photo(context: self.dataController.viewContext)
                                             photo.imageData = d
                                             photo.index = photoView.index
-                                            p.addToPhotos(photo)
+                                            mapPin.addToPhotos(photo)
                                         }
                                     }
                                     try? self.dataController.viewContext.save()
-                                }
                             }
                         })
                     }

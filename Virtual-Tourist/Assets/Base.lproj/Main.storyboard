@@ -79,6 +79,9 @@
                                 <rect key="frame" x="0.0" y="828" width="414" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <state key="normal" title="New Collection"/>
+                                <connections>
+                                    <action selector="doButtonTask:" destination="j5R-7u-UsU" eventType="touchUpInside" id="Mfh-UZ-JyU"/>
+                                </connections>
                             </button>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="DM6-l3-xSG">
                                 <rect key="frame" x="0.0" y="210" width="414" height="610"/>
