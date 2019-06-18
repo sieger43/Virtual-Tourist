@@ -11,18 +11,39 @@ import MapKit
 import UIKit
 import CoreData
 
-class VirtualTouristModel {
+class AlbumPhoto
+{
+    init(photo:UIImage?, index:Int32, photoSource:Photo?)
+    {
+        self.photo = photo
+        self.index = index
+        self.photoSource = photoSource
+    }
     
-    static var images = [PhotoView]()
+    convenience init(photo:UIImage?, index: Int32) {
+        self.init(photo: photo, index: index, photoSource: nil)
+    }
+    
+    convenience init() {
+        self.init(photo: nil, index: -1, photoSource: nil)
+    }
+    
+    var photo:UIImage?
+    var index:Int32
+    var photoSource:Photo?
+}
+
+class PhotoAlbum {
+    
+    static var images = [AlbumPhoto]()
     
 }
 
 class PhotoAlbumViewController: UIViewController {
     
     private let reuseIdentifier = "FlickrCell"
-    
-    var lat:Double = 0.0;
-    var lon:Double = 0.0;
+
+    var activePin:Pin?
     
     var dataController:DataController!
     
@@ -32,42 +53,57 @@ class PhotoAlbumViewController: UIViewController {
     
     @IBOutlet weak var collectionView: UICollectionView!
     
-    
     @IBAction func doButtonTask(_ sender: Any) {
-        if let button = self.newCollectionButton, let selectedItems = collectionView.indexPathsForSelectedItems {
+        if let selectedItems = collectionView.indexPathsForSelectedItems {
             
             if let title = newCollectionButton.currentTitle {
                 if title == "Remove Selected Pictures" {
                     
-                } else if title == "New Collection" {
-                    VirtualTouristModel.images.removeAll()
+                    let items = selectedItems.map { $0.item }.sorted().reversed()
                     
-                    for i: Int32 in 1...21 {
-                        VirtualTouristModel.images.append(PhotoView(photo: UIImage(named: "busyCell" ), index: i))
+                    for item in items {
+                        let photoToDelete = PhotoAlbum.images[item].photoSource
+                        if let ptd = photoToDelete {
+                            dataController.viewContext.delete(ptd)
+                            PhotoAlbum.images.remove(at: item)
+                            
+                        }
                     }
+                    try? self.dataController.viewContext.save()
                     
                     refreshPhotoList(forceRefresh: true)
+                    
+                    newCollectionButton.setTitle("New Collection", for: .normal)
+                    
+                } else if title == "New Collection" {
 
+                    var index : Int32 = 0
+                    
+                    for photoToDelete in PhotoAlbum.images {
+                        if let photoSource = photoToDelete.photoSource {
+                            dataController.viewContext.delete(photoSource)
+                            photoToDelete.photo = UIImage(named: "busyCell")
+                            photoToDelete.index = index
+                            index = index + 1
+                        }
+                    }
+                    try? self.dataController.viewContext.save()
+
+                    self.collectionView?.reloadData()
+                    
+                    refreshPhotoList(forceRefresh: true)
                 }
-                
-                
             }
         }
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        VirtualTouristModel.images.removeAll()
+        PhotoAlbum.images.removeAll()
 
         for i: Int32 in 1...21 {
-            VirtualTouristModel.images.append(PhotoView(photo: UIImage(named: "busyCell" ), index: i))
+            PhotoAlbum.images.append(AlbumPhoto(photo: UIImage(named: "busyCell" ), index: i))
         }
         
         collectionView.dataSource = self
@@ -84,61 +120,30 @@ class PhotoAlbumViewController: UIViewController {
         
         self.centerMapOnLocation()
         
-        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
-        let latPredicate = NSPredicate(format: "latitude = %@", argumentArray: [lat])
-        let lonPredicate = NSPredicate(format: "longitude = %@", argumentArray: [lon])
-        let andPredicate = NSCompoundPredicate(type: .and, subpredicates: [latPredicate, lonPredicate])
-        
-        fetch.predicate = andPredicate
-
-        var mapPin : Pin = Pin(context: dataController.persistentContainer.newBackgroundContext())
-        
-        do {
-            let result = try dataController.viewContext.fetch(fetch)
-            
-            if result.count == 1 {
-                mapPin = result[0] as! Pin
+        if let mapPin = activePin, let theSet = mapPin.photos {
+            let numPhotos = theSet.count
+            if numPhotos == 0 {
+                haveCachedPhotos = false
+            } else {
+                PhotoAlbum.images.removeAll()
                 
-                if forceRefresh {
-                    
-                    for photo in mapPin.photos! as! Set<Photo> {
-                        dataController.viewContext.delete(photo)
-                    }
-
-                    try? self.dataController.viewContext.save()
-                    
-                } else {
-
-                    if let theSet = mapPin.photos {
-                        let numPhotos = theSet.count
-                        if numPhotos == 0 {
-                            haveCachedPhotos = false
-                        } else {
-                           
-                            VirtualTouristModel.images.removeAll()
-                            
-                            for case let photo as Photo in theSet  {
-                                if let imageData = photo.imageData, let image = UIImage(data: imageData) {
-                                    VirtualTouristModel.images.append(PhotoView(photo: image, index: photo.index))
-                                }
-                            }
-                            
-                            VirtualTouristModel.images.sort(by: { $0.index > $1.index })
-                            
-                            haveCachedPhotos = true
-     
-                            self.collectionView?.reloadData()
-                        }
+                for case let photo as Photo in theSet  {
+                    if let imageData = photo.imageData, let image = UIImage(data: imageData) {
+                        PhotoAlbum.images.append(AlbumPhoto(photo: image, index: photo.index, photoSource: photo))
                     }
                 }
-           }
-        } catch {
-            let _ = "refreshPhotoList() Failed"
+                
+                PhotoAlbum.images.sort(by: { $0.index > $1.index })
+                
+                haveCachedPhotos = true
+                
+                self.collectionView?.reloadData()
+            }
         }
+        
+        if let mapPin = activePin, !haveCachedPhotos {
 
-        if !haveCachedPhotos {
-
-           FlickrClient.getPhotoList(lat: lat, lon: lon){ success, error, response in
+           FlickrClient.getPhotoList(lat: mapPin.latitude, lon: mapPin.longitude){ success, error, response in
                 if success {
 
                     var index: Int32 = 0;
@@ -146,34 +151,35 @@ class PhotoAlbumViewController: UIViewController {
                     if let thedata = response?.photos.photo {
                         
                         DispatchQueue.global().async(execute: {
-                            VirtualTouristModel.images.removeAll()
+                            PhotoAlbum.images.removeAll()
 
                             for photoRecord in thedata {
                                 if let unwrapped_URL = URL(string: photoRecord.url_s){
                                     do {
                                         let imageData = try Data(contentsOf: unwrapped_URL)
                                         if let image = UIImage(data: imageData) {
-                                            VirtualTouristModel.images.append(PhotoView(photo: image, index: index))
+                                            PhotoAlbum.images.append(AlbumPhoto(photo: image, index: index))
                                             index = index  + 1
                                             DispatchQueue.main.async(execute: {
-                                                VirtualTouristModel.images.sort(by: { $0.index > $1.index })
+                                                PhotoAlbum.images.sort(by: { $0.index > $1.index })
                                                 self.collectionView?.reloadData()
                                             })
                                         }
                                     } catch {
-                                        // empty
+                                        // empty on purpose
                                     }
                                 }
                             }
                             
                             if !haveCachedPhotos {
 
-                                    for photoView in VirtualTouristModel.images {
+                                    for photoView in PhotoAlbum.images {
                                         if let pic = photoView.photo  {
                                             let d = pic.pngData()
                                             let photo = Photo(context: self.dataController.viewContext)
                                             photo.imageData = d
                                             photo.index = photoView.index
+                                            photoView.photoSource = photo
                                             mapPin.addToPhotos(photo)
                                         }
                                     }
@@ -192,14 +198,17 @@ class PhotoAlbumViewController: UIViewController {
     private func centerMapOnLocation() {
         // from https://stackoverflow.com/questions/41639478/mkmapview-center-and-zoom-in?rq=1
         
-        let region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: lat, longitude: lon),
-                                        span: MKCoordinateSpan(latitudeDelta: 1.0, longitudeDelta: 1.0))
+        if let mapPin = activePin {
+        
+            let region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: mapPin.latitude, longitude: mapPin.longitude),
+                                            span: MKCoordinateSpan(latitudeDelta: 1.0, longitudeDelta: 1.0))
 
-        self.mapView.setRegion(region, animated: true)
-        let annotation = MKPointAnnotation()
-        annotation.coordinate.latitude = self.lat
-        annotation.coordinate.longitude = self.lon
-        self.mapView.addAnnotation(annotation)
+            self.mapView.setRegion(region, animated: true)
+            let annotation = MKPointAnnotation()
+            annotation.coordinate.latitude = mapPin.latitude
+            annotation.coordinate.longitude = mapPin.longitude
+            self.mapView.addAnnotation(annotation)
+        }
     }
     
     private func cropToBounds(image: UIImage) -> UIImage {
@@ -260,14 +269,14 @@ extension PhotoAlbumViewController: MKMapViewDelegate {
 extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
 
-        return VirtualTouristModel.images.count
+        return PhotoAlbum.images.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier,
                                                       for: indexPath) as! PhotoCell
        
-        let photoView = VirtualTouristModel.images[indexPath.row]
+        let photoView = PhotoAlbum.images[indexPath.row]
         
         if let photo = photoView.photo {
             

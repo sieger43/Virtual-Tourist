@@ -144,21 +144,41 @@ extension TravelLocationMapViewController: MKMapViewDelegate {
         
             if let annotation = view.annotation {
 
-                photoViewController.lat = annotation.coordinate.latitude;
-                photoViewController.lon = annotation.coordinate.longitude;
-                photoViewController.dataController = self.dataController
+                let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
+                let latPredicate = NSPredicate(format: "latitude = %@", argumentArray: [annotation.coordinate.latitude])
+                let lonPredicate = NSPredicate(format: "longitude = %@", argumentArray: [annotation.coordinate.longitude])
+                let andPredicate = NSCompoundPredicate(type: .and, subpredicates: [latPredicate, lonPredicate])
                 
-                DispatchQueue.main.async(execute: {
-
-                    if let annotation = view.annotation {
-                        // the selection of the pin doesn't automatically clear and
-                        // prevents the pin from being selected twice in a row; deselect
-                        // all the pins here
-                        mapView.deselectAnnotation(annotation, animated: false)
-                    }
+                fetch.predicate = andPredicate
+                
+                var mapPin : Pin = Pin(context: dataController.persistentContainer.newBackgroundContext())
+                
+                do {
+                    let result = try dataController.viewContext.fetch(fetch)
                     
-                    self.navigationController!.pushViewController(photoViewController, animated: true)
-                })
+                    if result.count == 1 {
+                        mapPin = result[0] as! Pin
+                        
+                        photoViewController.activePin = mapPin
+                        photoViewController.dataController = self.dataController
+                        
+                        DispatchQueue.main.async(execute: {
+                            
+                            if let annotation = view.annotation {
+                                // the selection of the pin doesn't automatically clear and
+                                // prevents the pin from being selected twice in a row; deselect
+                                // all the pins here
+                                mapView.deselectAnnotation(annotation, animated: false)
+                            }
+                            
+                            self.navigationController!.pushViewController(photoViewController, animated: true)
+                        })
+                    }
+                } catch {
+                    let _ = "pin lookup failed"
+                }
+                
+
             }
         }
     }
